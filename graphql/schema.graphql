@@ -1,0 +1,23 @@
+"A datetime string with format `Y-m-d H:i:s`"
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    "Ambil semua barang lelang"
+    items: [Item!]! @all
+
+    "Ambil detail barang berdasarkan ID"
+    item(id: ID! @eq): Item @find
+}
+
+type Item {
+    id: ID!
+    name: String!
+    description: String!
+    starting_price: Int!
+    current_highest_bid: Int!
+    auction_status: String!
+    auction_deadline: DateTime!
+    image_url: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
