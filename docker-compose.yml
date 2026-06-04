@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  katalog-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: katalog-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+      - ./database/database.sqlite:/var/www/database/database.sqlite
+    environment:
+      - APP_ENV=local
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/database/database.sqlite
+      - IAE_API_KEY=${IAE_API_KEY}
+      - L5_SWAGGER_GENERATE_ALWAYS=true
+    restart: unless-stopped
