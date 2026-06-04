@@ -1,5 +1,15 @@
 # Sistem Lelang Service Katalog
 
+## Identitas
+
+Nama: Rafly Zulfikar AlKautsar
+
+NIM: 102022400192
+
+Kelas: SI-48-08
+
+---
+
 ## Fitur Utama
 
 * **RESTful API Standar Kontrak**: Menyediakan 3 *endpoint* utama dengan format *response wrapper* JSON yang konsisten.
