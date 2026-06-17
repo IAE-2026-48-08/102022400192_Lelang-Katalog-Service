@@ -57,6 +57,84 @@
                         "ApiKeyAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Katalog"
+                ],
+                "summary": "Tambah item baru ke katalog lelang",
+                "operationId": "a4fb16eb9970fcb06a5d70ace3026f4f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Lukisan Vintage"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Lukisan langka tahun 1920"
+                                    },
+                                    "starting_price": {
+                                        "type": "integer",
+                                        "example": 5000000
+                                    },
+                                    "auction_deadline": {
+                                        "type": "string",
+                                        "example": "2026-07-01 18:00:00"
+                                    },
+                                    "image_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.jpg"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item berhasil ditambahkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Item berhasil ditambahkan"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    },
+                    "401": {
+                        "description": "Unauthorized - API Key tidak valid"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/items/{id}": {

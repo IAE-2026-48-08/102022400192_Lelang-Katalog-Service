@@ -139,4 +139,69 @@ class ItemController extends Controller
 
         return ApiResponse::success($items, 'Data filtered successfully');
     }
+
+    #[OA\Post(
+    path: "/api/v1/items",
+    summary: "Tambah item baru ke katalog lelang",
+    tags: ["Katalog"],
+    security: [["ApiKeyAuth" => []]],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "name", type: "string", example: "Lukisan Vintage"),
+                new OA\Property(property: "description", type: "string", example: "Lukisan langka tahun 1920"),
+                new OA\Property(property: "starting_price", type: "integer", example: 5000000),
+                new OA\Property(property: "auction_deadline", type: "string", example: "2026-07-01 18:00:00"),
+                new OA\Property(property: "image_url", type: "string", example: "https://example.com/image.jpg"),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 201,
+            description: "Item berhasil ditambahkan",
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "status", type: "string", example: "success"),
+                    new OA\Property(property: "message", type: "string", example: "Item berhasil ditambahkan"),
+                    new OA\Property(property: "data", type: "object"),
+                    new OA\Property(property: "meta", type: "object"),
+                ]
+            )
+        ),
+        new OA\Response(response: 422, description: "Validasi gagal"),
+        new OA\Response(response: 401, description: "Unauthorized - API Key tidak valid")
+    ]
+)]
+public function store(Request $request)
+{
+    $validator = validator($request->all(), [
+        'name'             => 'required|string|max:255',
+        'description'      => 'required|string',
+        'starting_price'   => 'required|integer|min:0',
+        'auction_deadline' => 'required|date',
+        'image_url'        => 'nullable|url',
+    ]);
+
+    if ($validator->fails()) {
+        return ApiResponse::error(
+            'Validasi gagal.',
+            422,
+            $validator->errors()
+        );
+    }
+
+    $item = Item::create([
+        'name'              => $request->name,
+        'description'       => $request->description,
+        'starting_price'    => $request->starting_price,
+        'current_highest_bid' => 0,
+        'auction_status'    => 'OPEN',
+        'auction_deadline'  => $request->auction_deadline,
+        'image_url'         => $request->image_url,
+    ]);
+
+    return ApiResponse::success($item, 'Item berhasil ditambahkan.', 201);
+    }
 }
