@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Models\Item;
+use App\Services\SoapAuditService;
+use App\Services\RabbitMQService;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
@@ -185,23 +187,41 @@ public function store(Request $request)
     ]);
 
     if ($validator->fails()) {
-        return ApiResponse::error(
-            'Validasi gagal.',
-            422,
-            $validator->errors()
-        );
+        return ApiResponse::error('Validasi gagal.', 422, $validator->errors());
     }
 
     $item = Item::create([
-        'name'              => $request->name,
-        'description'       => $request->description,
-        'starting_price'    => $request->starting_price,
+        'name'                => $request->name,
+        'description'         => $request->description,
+        'starting_price'      => $request->starting_price,
         'current_highest_bid' => 0,
-        'auction_status'    => 'OPEN',
-        'auction_deadline'  => $request->auction_deadline,
-        'image_url'         => $request->image_url,
+        'auction_status'      => 'OPEN',
+        'auction_deadline'    => $request->auction_deadline,
+        'image_url'           => $request->image_url,
     ]);
 
-    return ApiResponse::success($item, 'Item berhasil ditambahkan.', 201);
+    $soapService   = new SoapAuditService();
+    $receiptNumber = $soapService->audit('ItemCreated', [
+        'item_id'          => $item->id,
+        'name'             => $item->name,
+        'starting_price'   => $item->starting_price,
+        'auction_status'   => $item->auction_status,
+        'auction_deadline' => $item->auction_deadline,
+    ]);
+
+    $rabbitMQ = new RabbitMQService();
+    $rabbitMQ->publish('item.created', [
+        'item_id'          => $item->id,
+        'name'             => $item->name,
+        'starting_price'   => $item->starting_price,
+        'auction_status'   => $item->auction_status,
+        'auction_deadline' => $item->auction_deadline,
+    ]);
+
+    return ApiResponse::success(
+        array_merge($item->toArray(), ['receipt_number' => $receiptNumber]),
+        'Item berhasil ditambahkan.',
+        201
+    );
     }
 }
