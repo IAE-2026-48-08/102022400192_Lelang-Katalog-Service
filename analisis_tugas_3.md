@@ -15,11 +15,11 @@
 ### Mengapa Ini Transaksi Kritis?
 Penambahan item baru ke katalog lelang merupakan transaksi kritis karena:
 
-1. **State-Changing** — Operasi ini mengubah state sistem secara permanen.
+1. **State-Changing**, Operasi ini mengubah state sistem secara permanen.
    Data item baru tersimpan di database dan langsung mempengaruhi
    ketersediaan barang lelang di seluruh ekosistem.
 
-2. **Dampak Lintas Service** — Setelah item baru ditambahkan:
+2. **Dampak Lintas Service**, Setelah item baru ditambahkan:
    - Service Penawaran (Bidding) baru bisa menerima bid untuk item tersebut
    - Service Pemenang & Invoice baru bisa memproses pemenang lelang
 
