@@ -67,57 +67,42 @@ Penambahan item baru ke katalog lelang merupakan transaksi kritis karena:
 ### Alur Lengkap POST /api/v1/items dengan SSO, SOAP, dan RabbitMQ:
 
 ```
-┌────────┐      ┌──────────────────┐      ┌─────────┐      ┌───────────┐      ┌──────────────┐
-│ Client │      │ Service Katalog   │      │ IAE SSO │      │ SOAP Audit│      │ RabbitMQ HTTP│
-└───┬────┘      └────────┬──────────┘      └────┬────┘      └─────┬─────┘      └──────┬───────┘
-    │                    │                       │                 │                    │
-    │  POST /api/v1/items│                       │                 │                    │
-    │───────────────────>│                       │                 │                    │
-    │  Header: X-IAE-KEY │                       │                 │                    │
-    │  Header: Bearer JWT│                       │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │  GET /api/v1/auth/jwks│                 │                    │
-    │                    │──────────────────────>│                 │                    │
-    │                    │   Public Key (RS256)  │                 │                    │
-    │                    │<- - - - - - - - - - - │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │ Verify JWT (lokal)     │                 │                    │
-    │                    │ ○                     │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │ Simpan Item ke DB      │                 │                    │
-    │                    │ ○                     │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │  POST /api/v1/auth/token (M2M)          │                    │
-    │                    │──────────────────────>│                 │                    │
-    │                    │     M2M Token          │                 │                    │
-    │                    │<- - - - - - - - - - - │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │       SOAP AuditRequest                  │                    │
-    │                    │──────────────────────────────────────────>│                    │
-    │                    │ TeamID: TEAM-02, ActivityName: ItemCreated,│                    │
-    │                    │ LogContent: JSON       │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │      ReceiptNumber: IAE-LOG-2026-XXXX     │                    │
-    │                    │<- - - - - - - - - - - - - - - - - - - - - │                    │
-    │                    │                       │                 │                    │
-    │                    │  POST /api/v1/auth/token (M2M)          │                    │
-    │                    │──────────────────────>│                 │                    │
-    │                    │     M2M Token          │                 │                    │
-    │                    │<- - - - - - - - - - - │                 │                    │
-    │                    │                       │                 │                    │
-    │                    │           POST /api/v1/messages/publish                       │
-    │                    │───────────────────────────────────────────────────────────────>│
-    │                    │ routing_key: item.created, payload: JSON event                 │
-    │                    │                       │                 │                    │
-    │                    │             200 OK (published)                                 │
-    │                    │<- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -│
-    │                    │                       │                 │                    │
-    │   201 Created      │                       │                 │                    │
-    │<- - - - - - - - - -│                       │                 │                    │
-    │ item data, receipt_number, rabbitmq_published: true                                │
-    │                    │                       │                 │                    │
-```
+mermaid
+sequenceDiagram
+    participant Client
+    participant Katalog as Service Katalog
+    participant SSO as IAE SSO
+    participant SOAP as SOAP Audit
+    participant MQ as RabbitMQ HTTP
 
+    Client->>Katalog: POST /api/v1/items
+    Note over Client,Katalog: Header X-IAE-KEY, Header Bearer JWT
+
+    Katalog->>SSO: GET /api/v1/auth/jwks
+    SSO-->>Katalog: Public Key RS256
+
+    Katalog->>Katalog: Verify JWT lokal
+    Katalog->>Katalog: Simpan item ke DB
+
+    Katalog->>SSO: POST /api/v1/auth/token (M2M)
+    SSO-->>Katalog: M2M Token
+
+    Katalog->>SOAP: SOAP AuditRequest
+    Note over Katalog,SOAP: TeamID TEAM-02, ActivityName ItemCreated
+
+    SOAP-->>Katalog: ReceiptNumber IAE-LOG-2026-XXXX
+
+    Katalog->>SSO: POST /api/v1/auth/token (M2M)
+    SSO-->>Katalog: M2M Token
+
+    Katalog->>MQ: POST /api/v1/messages/publish
+    Note over Katalog,MQ: routing_key item.created
+
+    MQ-->>Katalog: 200 OK published
+
+    Katalog-->>Client: 201 Created
+    Note over Katalog,Client: receipt_number, rabbitmq_published true
+```
 ---
 
 ## 4. Skema Role Lokal (SSO Mapping)
