@@ -12,7 +12,7 @@ Kelas: SI-48-08
 
 ## Fitur Utama
 
-* **RESTful API Standar Kontrak**: Menyediakan 3 *endpoint* utama dengan format *response wrapper* JSON yang konsisten.
+* **RESTful API Standar Kontrak**: Menyediakan 4 *endpoint* utama dengan format *response wrapper* JSON yang konsisten.
 * **Header Authentication**: Semua *endpoint* dilindungi menggunakan API Key khusus (`X-IAE-KEY`).
 * **Interactive API Documentation**: Dilengkapi dengan Swagger UI (OpenAPI 3.0) menggunakan PHP Attributes terbaru.
 * **GraphQL Implementation**: Mendukung kueri GraphQL yang dinamis beserta antarmuka GraphQL Playground untuk pengujian.
@@ -101,6 +101,7 @@ Akses antarmuka dokumentasi Swagger untuk menguji endpoint REST secara langsung.
 1. `GET /api/v1/items` (Mengambil semua daftar barang lelang)
 2. `GET /api/v1/items/{id}` (Mengambil detail spesifik 1 barang)
 3. `POST /api/v1/items/filter` (Memfilter daftar barang berdasarkan kriteria tertentu)
+4. `POST /api/v1/items` (Menambahkan item baru ke katalog lelang)
 
 **GraphQL Playground**
 
