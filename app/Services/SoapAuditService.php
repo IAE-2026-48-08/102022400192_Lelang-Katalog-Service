@@ -66,6 +66,7 @@ XML;
     {
     $response = Http::post('https://iae-sso.virtualfri.id/api/v1/auth/token', [
         'api_key' => env('IAE_M2M_API_KEY', 'KEY-MHS-243'),
+        'nim'     => env('IAE_NIM', '102022400192'),
     ]);
 
     return $response->json('token');

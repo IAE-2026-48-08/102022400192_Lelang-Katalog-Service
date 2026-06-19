@@ -54,10 +54,11 @@ class RabbitMQService
 
     private function getM2MToken(): string
     {
-        $response = Http::post('https://iae-sso.virtualfri.id/api/v1/auth/token', [
-            'api_key' => $this->apiKey,
-        ]);
+    $response = Http::post('https://iae-sso.virtualfri.id/api/v1/auth/token', [
+        'api_key' => $this->apiKey,
+        'nim'     => env('IAE_NIM', '102022400192'),
+    ]);
 
-        return $response->json('token');
+    return $response->json('token');
     }
 }
