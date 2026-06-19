@@ -66,8 +66,7 @@ Penambahan item baru ke katalog lelang merupakan transaksi kritis karena:
 
 ### Alur Lengkap POST /api/v1/items dengan SSO, SOAP, dan RabbitMQ:
 
-```
-mermaid
+```mermaid
 sequenceDiagram
     participant Client
     participant Katalog as Service Katalog
