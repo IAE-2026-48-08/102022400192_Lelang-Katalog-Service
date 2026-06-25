@@ -154,8 +154,8 @@ class ItemController extends Controller
                 new OA\Property(property: "name", type: "string", example: "Lukisan Vintage"),
                 new OA\Property(property: "description", type: "string", example: "Lukisan langka tahun 1920"),
                 new OA\Property(property: "starting_price", type: "integer", example: 5000000),
-                new OA\Property(property: "auction_deadline", type: "string", example: "2026-07-01 18:00:00"),
-                new OA\Property(property: "image_url", type: "string", example: "https://example.com/image.jpg"),
+                new OA\Property(property: "auction_deadline", type: "string", example: "2026-09-30 18:00:00"),
+                new OA\Property(property: "image_url", type: "string", example: "https://example.com/image.jpg", nullable: true),
             ]
         )
     ),
@@ -166,14 +166,53 @@ class ItemController extends Controller
             content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: "status", type: "string", example: "success"),
-                    new OA\Property(property: "message", type: "string", example: "Item berhasil ditambahkan"),
-                    new OA\Property(property: "data", type: "object"),
-                    new OA\Property(property: "meta", type: "object"),
+                    new OA\Property(property: "message", type: "string", example: "Item berhasil ditambahkan."),
+                    new OA\Property(
+                        property: "data",
+                        properties: [
+                            new OA\Property(property: "id", type: "integer", example: 1),
+                            new OA\Property(property: "name", type: "string", example: "Lukisan Vintage"),
+                            new OA\Property(property: "description", type: "string", example: "Lukisan langka tahun 1920"),
+                            new OA\Property(property: "starting_price", type: "integer", example: 5000000),
+                            new OA\Property(property: "current_highest_bid", type: "integer", example: 0),
+                            new OA\Property(property: "auction_status", type: "string", example: "OPEN"),
+                            new OA\Property(property: "auction_deadline", type: "string", example: "2026-09-30T18:00:00.000000Z"),
+                        ],
+                        type: "object"
+                    ),
+                    new OA\Property(
+                        property: "meta",
+                        properties: [
+                            new OA\Property(property: "service_name", type: "string", example: "Katalog-Service"),
+                            new OA\Property(property: "api_version", type: "string", example: "v1"),
+                        ],
+                        type: "object"
+                    ),
                 ]
             )
         ),
-        new OA\Response(response: 422, description: "Validasi gagal"),
-        new OA\Response(response: 401, description: "Unauthorized - API Key tidak valid")
+        new OA\Response(
+            response: 422,
+            description: "Validasi gagal",
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "status", type: "string", example: "error"),
+                    new OA\Property(property: "message", type: "string", example: "Validasi gagal."),
+                    new OA\Property(property: "errors", type: "object"),
+                ]
+            )
+        ),
+        new OA\Response(
+            response: 401,
+            description: "Unauthorized - API Key tidak valid",
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "status", type: "string", example: "error"),
+                    new OA\Property(property: "message", type: "string", example: "Unauthorized. API Key tidak valid atau tidak ditemukan."),
+                    new OA\Property(property: "errors", type: "string", example: "null", nullable: true),
+                ]
+            )
+        )
     ]
 )]
 public function store(Request $request)
