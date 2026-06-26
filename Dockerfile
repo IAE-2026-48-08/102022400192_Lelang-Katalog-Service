@@ -11,7 +11,6 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-# Pastikan file SQLite ada sebelum migrate
 RUN mkdir -p database && touch database/database.sqlite
 
 RUN cp .env.example .env && php artisan key:generate
